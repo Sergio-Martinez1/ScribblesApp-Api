@@ -14,4 +14,5 @@ class Post(Base):
     publication_date = Column(DateTime)
     user_id = Column(Integer, ForeignKey('users.id'))
     tags = relationship('Tag', back_populates='post')
+    reactions = relationship('Reaction', back_populates='post')
     comments = relationship('Comment', back_populates='post')
