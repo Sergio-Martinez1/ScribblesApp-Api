@@ -6,6 +6,8 @@ class Comment(BaseModel):
 
     class Config():
         schema_extra = {
-            "example": "This is a comment example"
+            "example": {
+                "content": "Some content for a comment",
+            }
         }
         orm_mode = True
