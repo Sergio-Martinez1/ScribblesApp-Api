@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, Date
 from db_config.database import Base
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
@@ -39,7 +39,7 @@ class Post(Base):
     title = Column(String)
     thumbnail = Column(String)
     content = Column(String)
-    publication_date = Column(DateTime)
+    publication_date = Column(Date)
     user_id = Column(Integer, ForeignKey('users.id'))
     tags = relationship('Tag', back_populates='post')
     reactions = relationship('Reaction', back_populates='post')
