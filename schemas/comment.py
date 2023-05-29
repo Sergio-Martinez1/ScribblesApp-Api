@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field
 
 
 class Comment(BaseModel):
-    content: str = Field(default="", max_length=200)
+    content: str = Field(default="", max_length=1000)
+    user_id: int
 
     class Config():
         schema_extra = {
