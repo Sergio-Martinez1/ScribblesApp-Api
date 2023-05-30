@@ -32,4 +32,4 @@ async def create_reaction(reaction: Reaction,
 async def delete_reaction(id: int,
                           db: Session = Depends(get_db)):
     await ReactionService().delete_reaction(id, db)
-    return JSONResponse(content={"message": "Succesful reaction created."})
+    return JSONResponse(content={"message": "Succesful reaction deleted."})
