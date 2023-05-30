@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class Comment(BaseModel):
+    id: int
     content: str = Field(default="", max_length=1000)
     user_id: int
 
