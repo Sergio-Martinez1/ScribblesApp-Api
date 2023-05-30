@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class Tag(BaseModel):
+    id: int
     content: str = Field(default=None)
 
     class Config():
