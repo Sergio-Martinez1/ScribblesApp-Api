@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String)
     password = Column(String)
     email = Column(String)
@@ -17,7 +17,7 @@ class User(Base):
 class Tag(Base):
     __tablename__ = "tags"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     content = Column(String)
     post_id = Column(Integer, ForeignKey('posts.id'))
     post = relationship('Post', back_populates='tags')
@@ -26,7 +26,7 @@ class Tag(Base):
 class Reaction(Base):
     __tablename__ = "reactions"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     post_id = Column(Integer, ForeignKey('posts.id'))
     post = relationship('Post', back_populates='reactions')
@@ -35,7 +35,7 @@ class Reaction(Base):
 class Post(Base):
     __tablename__ = "posts"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String)
     thumbnail = Column(String)
     content = Column(String)
@@ -49,7 +49,7 @@ class Post(Base):
 class Comment(Base):
     __tablename__ = "comments"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey('posts.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     content = Column(String)
