@@ -10,11 +10,18 @@ class User(BaseModel):
 
     class Config:
         schema_extra = {
-                "example": {
-                    "username": "Pepe21",
-                    "email": "pepe21@email.com",
-                    "password": "pepe21A1",
-                    "image": "http://image.com"
-                    }
-                }
+            "example": {
+                "username": "Pepe21",
+                "email": "pepe21@email.com",
+                "password": "pepe21A1",
+                "image": "http://image.com"
+            }
+        }
         orm_mode = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user_id: int
+    username: str
