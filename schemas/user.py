@@ -3,9 +3,9 @@ from typing import Optional
 
 
 class User(BaseModel):
-    username: str = Field(min_length=4, max_length=30)
+    username: str = Field(min_length=1, max_length=1000)
     email: str
-    password: str = Field(min_length=6, max_length=30)
+    password: str = Field(min_length=1, max_length=1000)
     image: Optional[str] = None
 
     class Config:
