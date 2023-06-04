@@ -14,15 +14,32 @@ class UserService():
         pass
 
     async def get_users(self, db: Session):
-        return db.query(UserModel).all()
+        users = db.query(UserModel).all()
+
+        if not users:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="No users found")
+        return users
 
     async def get_user(self, id: int, db: Session):
-        return db.query(UserModel).filter(UserModel.id == id).first()
+        user = db.query(UserModel).filter(UserModel.id == id).first()
 
-    async def create_user(self, user: User, db: Session):
-        hashed_password = hash_password.create_hash(user.password)
-        user.password = hashed_password
-        new_user = UserModel(**user.dict())
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User does not exist")
+        return user
+
+    async def create_user(self, request: User, db: Session):
+        user = db.query(UserModel).filter(
+            UserModel.username == request.username).first()
+
+        if user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Username already exist")
+
+        hashed_password = hash_password.create_hash(request.password)
+        request.password = hashed_password
+        new_user = UserModel(**request.dict())
         db.add(new_user)
         db.commit()
         return
@@ -44,5 +61,6 @@ class UserService():
                 "username": dbUser.username
             }
         else:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Incorrect password")
+        return

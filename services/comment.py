@@ -1,33 +1,66 @@
 from sqlalchemy.orm import Session
 from models.models import Comment as CommentModel
-from schemas.comment import Comment
+from schemas.comment import CommentIn, CommentToEdit
+from models.models import User as UserModel
+from fastapi import HTTPException, status
 
 
 class CommentService():
+
     def __init__(self):
         pass
 
     async def get_comments(self, db: Session):
-        return db.query(CommentModel).all()
+        comments = db.query(CommentModel).all()
+        if not comments:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Comments not found")
+        return comments
 
-    async def create_comment(self, comment: Comment, db: Session):
-        new_comment = CommentModel(**comment.dict())
+    async def create_comment(self, comment: CommentIn, db: Session,
+                             username: str):
+        creator = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not creator:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Sign in first")
+
+        new_comment = CommentModel(content=comment.content,
+                                   user_id=creator.id,
+                                   post_id=comment.post_id)
         db.add(new_comment)
         db.commit()
         return
 
-    async def update_comment(self, id: int,  comment: Comment, db: Session):
-        comment = db.query(CommentModel).filter(CommentModel.id == id).first()
-        comment.update({
-            CommentModel.content: Comment.content
-        })
+    async def update_comment(self, id: int, new_comment: CommentToEdit,
+                             db: Session, username: str):
+        comment = db.query(CommentModel).filter(CommentModel.id == id)
+        if not comment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Comment not found")
+
+        creator = db.query(UserModel).filter(
+            UserModel.id == comment.first().user_id).first()
+        if username != creator.username:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Operation not allowed")
+
+        comment.update({CommentModel.content: new_comment.content})
         db.commit()
         return
 
-    async def delete_comment(self, id: int, db: Session):
-        result = db.query(CommentModel).filter(CommentModel.id == id).first()
-        if not result:
-            return
-        db.delete(result)
+    async def delete_comment(self, id: int, db: Session, username: str):
+        comment = db.query(CommentModel).filter(CommentModel.id == id).first()
+        if not comment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Comment not found")
+
+        creator = db.query(UserModel).filter(
+            UserModel.id == comment.user_id).first()
+        if username != creator.username:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Operation not allowed")
+
+        db.delete(comment)
         db.commit()
         return
