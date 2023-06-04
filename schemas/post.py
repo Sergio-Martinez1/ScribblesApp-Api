@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from datetime import date
 from .tag import Tag
-from .comment import Comment
+from schemas.comment import CommentOut
 from .reaction import Reaction
 
 
@@ -16,7 +16,7 @@ class PostOut(BaseModel):
     user_id: int
     tags: List[Tag] = []
     reactions: List[Reaction] = []
-    comments: List[Comment] = []
+    comments: List[CommentOut] = []
 
     class Config():
         orm_mode = True
