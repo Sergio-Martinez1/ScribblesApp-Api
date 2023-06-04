@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from typing import List
-from schemas.comment import Comment
+from schemas.comment import CommentIn, CommentOut, CommentToEdit
 from db_config.database import get_db
 from sqlalchemy.orm import Session
 from services.comment import CommentService
-
+from auth.authenticate import authenticate
 
 comments_router = APIRouter(prefix='/comments', tags=['comments'])
 
 
 @comments_router.get('/',
-                     response_model=List[Comment],
+                     response_model=List[CommentOut],
                      status_code=status.HTTP_200_OK)
 async def get_comments(db: Session = Depends(get_db)):
     comments = await CommentService().get_comments(db)
@@ -21,18 +21,21 @@ async def get_comments(db: Session = Depends(get_db)):
 @comments_router.post('/',
                       response_model=dict,
                       status_code=status.HTTP_201_CREATED)
-async def create_comment(comment: Comment,
-                         db: Session = Depends(get_db)):
-    await CommentService().create_comment(comment, db)
+async def create_comment(comment: CommentIn,
+                         db: Session = Depends(get_db),
+                         user: str = Depends(authenticate)):
+    await CommentService().create_comment(comment, db, user)
     return JSONResponse(content={"message": "Succesful comment created."})
 
 
 @comments_router.put('/{id}',
                      response_model=dict,
                      status_code=status.HTTP_200_OK)
-async def update_comment(id: int, comment: Comment,
-                         db: Session = Depends(get_db)):
-    await CommentService().update_comment(id, comment, db)
+async def update_comment(id: int,
+                         comment: CommentToEdit,
+                         db: Session = Depends(get_db),
+                         user: str = Depends(authenticate)):
+    await CommentService().update_comment(id, comment, db, user)
     return JSONResponse(content={"message": "Succesful comment update."})
 
 
@@ -40,6 +43,7 @@ async def update_comment(id: int, comment: Comment,
                         response_model=dict,
                         status_code=status.HTTP_200_OK)
 async def delete_comment(id: int,
-                         db: Session = Depends(get_db)):
-    await CommentService().delete_comment(id, db)
+                         db: Session = Depends(get_db),
+                         user: str = Depends(authenticate)):
+    await CommentService().delete_comment(id, db, user)
     return JSONResponse(content={"message": "Succesful comment deleted."})

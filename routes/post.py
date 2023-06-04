@@ -19,6 +19,14 @@ async def get_posts(db: Session = Depends(get_db)) -> List[PostOut]:
     return posts
 
 
+@posts_router.get('/{id}',
+                  response_model=PostOut,
+                  status_code=status.HTTP_200_OK)
+async def get_post(id: int, db: Session = Depends(get_db)) -> PostOut:
+    post = await PostService().get_post(id, db)
+    return post
+
+
 @posts_router.post('/',
                    response_model=dict,
                    status_code=status.HTTP_201_CREATED)
