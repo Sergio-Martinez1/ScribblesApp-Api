@@ -1,10 +1,9 @@
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine
+from .connection import settings
 
-DATA_BASE_URL = "postgresql://sergiod:sergiod@localhost/scribbles_db"
-
-engine = create_engine(DATA_BASE_URL)
+engine = create_engine(settings.get_db_url(True))
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
