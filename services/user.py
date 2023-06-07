@@ -44,6 +44,20 @@ class UserService():
         db.commit()
         return
 
+    async def delete_user(self, username: str, request: User, db: Session):
+        user_exist = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user_exist:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User not found")
+        if user_exist.username != request.username:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Operation not allowed")
+
+        db.delete(user_exist)
+        db.commit()
+        return
+
     async def login_user(self, username: str, password: str, db: Session):
         dbUser = db.query(UserModel).filter(
             UserModel.username == username).first()
