@@ -5,6 +5,10 @@ import pytest
 from main import app
 from models.models import User
 from models.models import Post
+from models.models import Tag
+from models.models import Reaction
+from models.models import Comment
+from db_config.database import SessionLocal
 
 
 @pytest.fixture(scope='session')
@@ -18,6 +22,13 @@ def event_loop():
 async def default_client():
     async with httpx.AsyncClient(app=app, base_url="http://app") as client:
         yield client
-# # Clean up resources
-#     await Event.find_all().delete()
-#     await User.find_all().delete()
+
+
+# Clean up resources
+    db = SessionLocal()
+    db.query(User).delete()
+    db.query(Post).delete()
+    db.query(Tag).delete()
+    db.query(Reaction).delete()
+    db.query(Comment).delete()
+    db.commit()
