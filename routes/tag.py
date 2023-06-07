@@ -23,7 +23,8 @@ async def create_tag(tag: Tag,
                      db: Session = Depends(get_db),
                      user: str = Depends(authenticate)):
     await TagService().create_tag(tag, db, user)
-    return JSONResponse(content={"message": "Succesful tag created."})
+    return JSONResponse(content={"message": "Succesful tag created."},
+                        status_code=status.HTTP_201_CREATED)
 
 
 @tags_router.delete('/{id}',

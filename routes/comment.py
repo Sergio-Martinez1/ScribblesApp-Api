@@ -25,7 +25,8 @@ async def create_comment(comment: CommentIn,
                          db: Session = Depends(get_db),
                          user: str = Depends(authenticate)):
     await CommentService().create_comment(comment, db, user)
-    return JSONResponse(content={"message": "Succesful comment created."})
+    return JSONResponse(content={"message": "Succesful comment created."},
+                        status_code=status.HTTP_201_CREATED)
 
 
 @comments_router.put('/{id}',
