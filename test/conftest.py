@@ -26,9 +26,9 @@ async def default_client():
 
 # Clean up resources
     db = SessionLocal()
-    db.query(User).delete()
-    db.query(Post).delete()
-    db.query(Tag).delete()
-    db.query(Reaction).delete()
     db.query(Comment).delete()
+    db.query(Reaction).delete()
+    db.query(Tag).delete()
+    db.query(Post).delete()
+    db.query(User).delete()
     db.commit()
