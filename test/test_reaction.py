@@ -4,19 +4,21 @@ from models.models import Post, Reaction, User
 from db_config.database import SessionLocal
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
+from datetime import date
 
 
 @pytest.fixture(scope="module")
 async def access_token() -> str:
-    return create_access_token("mutska")
+    return create_access_token("sergio")
 
 
 @pytest.fixture(scope="module")
 async def mock_user() -> User:
-    hashed_password = HashPassword().create_hash("fakepassword")
+    test_password = "123456"
+    hashed_password = HashPassword().create_hash(test_password)
     userModel = User(
-        username="mutska",
-        email="mutska@mail.com",
+        username="sergio",
+        email="sergio@mail.com",
         password=hashed_password,
         image="http://image.com",
     )
@@ -24,49 +26,44 @@ async def mock_user() -> User:
     db.add(userModel)
     db.commit()
     db.refresh(userModel)
-    db.close()
-    yield userModel
+    stored_user = db.query(User).filter(
+        User.username == userModel.username).first()
+    yield stored_user
 
 
 @pytest.fixture(scope="module")
-async def mock_post(mock_user: User) -> Reaction:
-    new_post = Post(
-        title="Test Post",
-        thumbnail="https://fakeimage.com",
-        content="This a test post",
-        publication_date="2023-06-01",
-        user_id=1
-    )
+async def mock_post(mock_user: User) -> Post:
+    new_post = Post(title="Title for a test post",
+                    thumbnail="http://image.com",
+                    content="Some content for a test post",
+                    publication_date=date.today(),
+                    user_id=mock_user.id)
     db = SessionLocal()
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    db.close()
-    yield new_post
+    stored_post = db.query(Post).filter(Post.user_id == mock_user.id).first()
+    yield stored_post
 
 
 @pytest.fixture(scope="module")
-async def mock_reaction(mock_post: Post) -> Reaction:
+async def mock_reaction(mock_post: Post, mock_user: User) -> Reaction:
     db = SessionLocal()
 
-    reaction_to_delete = Reaction(
-        user_id=1,
-        post_id=1
-    )
+    reaction_to_delete = Reaction(user_id=mock_user.id, post_id=mock_post.id)
     db.add(reaction_to_delete)
     db.commit()
     db.refresh(reaction_to_delete)
     db.close()
 
-    new_reaction = Reaction(
-        user_id=1,
-        post_id=1
-    )
+    new_reaction = Reaction(user_id=mock_user.id, post_id=mock_post.id)
     db.add(new_reaction)
     db.commit()
     db.refresh(new_reaction)
     db.close()
-    yield new_reaction
+    stored_reaction = db.query(Reaction).filter(
+        Reaction.user_id == mock_user.id).first()
+    yield stored_reaction
 
 
 @pytest.mark.asyncio
@@ -78,11 +75,9 @@ async def test_get_reactions(default_client: httpx.AsyncClient,
 
 @pytest.mark.asyncio
 async def test_create_reaction(default_client: httpx.AsyncClient,
-                               access_token: str) -> None:
-    payload = {
-        "user_id": 1,
-        "post_id": 1
-    }
+                               access_token: str, mock_user: User,
+                               mock_post: Post) -> None:
+    payload = {"user_id": mock_user.id, "post_id": mock_post.id}
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -99,7 +94,8 @@ async def test_create_reaction(default_client: httpx.AsyncClient,
 
 @pytest.mark.asyncio
 async def test_delete_reaction(default_client: httpx.AsyncClient,
-                               access_token: str) -> None:
+                               access_token: str,
+                               mock_reaction: Reaction) -> None:
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -107,7 +103,7 @@ async def test_delete_reaction(default_client: httpx.AsyncClient,
     }
     test_response = {"message": "Succesful reaction deleted."}
 
-    response = await default_client.delete("/reactions/1",
+    response = await default_client.delete(f"/reactions/{mock_reaction.id}",
                                            headers=headers)
     assert response.status_code == 200
     assert response.json() == test_response
