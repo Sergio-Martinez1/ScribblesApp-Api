@@ -6,6 +6,8 @@ class Settings(BaseSettings):
 
     DATABASE_URL: Optional[str] = None
     TEST_DATABASE_URL: Optional[str] = None
+    SECRET_KEY: str = None
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = None
 
     def get_db_url(self, test=False):
         if test:
