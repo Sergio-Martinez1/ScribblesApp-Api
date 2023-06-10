@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  api:
+    build: .
+    image: scribbles-api:latest
+    ports: 
+      - "8080:8080"
+    env_file:
+      - .env.prod
+    volumes:
+      - files:/app/files
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    ports: 
+      - "5432"
+    env_file:
+      - .env.prod
+    volumes:
+      - scribbles:/var/lib/postgresql/data
+volumes:
+  scribbles:
+  files:
