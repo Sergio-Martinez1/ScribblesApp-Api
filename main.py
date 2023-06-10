@@ -8,6 +8,7 @@ from routes.upload import upload_router
 from db_config.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import uvicorn
 
 app = FastAPI()
 
@@ -27,3 +28,7 @@ app.include_router(upload_router)
 app.mount('/files', StaticFiles(directory='files'), name='files')
 
 Base.metadata.create_all(bind=engine)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
