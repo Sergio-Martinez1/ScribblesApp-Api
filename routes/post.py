@@ -3,8 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from services.post import PostService
 from db_config.database import get_db
-from typing import List, Optional
-from pydantic import Field
+from typing import List
 from schemas.post import PostIn, PostOut
 from auth.authenticate import authenticate
 
