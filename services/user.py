@@ -1,5 +1,5 @@
 from models.models import User as UserModel
-from schemas.user import User
+from schemas.user import NewUser, MyUser
 from sqlalchemy.orm import Session
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
@@ -21,6 +21,15 @@ class UserService():
                                 detail="No users found")
         return users
 
+    async def get_my_user(self, username: str, db: Session):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User does not exits")
+        return user
+
     async def get_user(self, id: int, db: Session):
         user = db.query(UserModel).filter(UserModel.id == id).first()
 
@@ -29,7 +38,7 @@ class UserService():
                                 detail="User does not exist")
         return user
 
-    async def create_user(self, request: User, db: Session):
+    async def create_user(self, request: NewUser, db: Session):
         user = db.query(UserModel).filter(
             UserModel.username == request.username).first()
 
@@ -44,15 +53,12 @@ class UserService():
         db.commit()
         return
 
-    async def delete_user(self, username: str, request: User, db: Session):
+    async def delete_user(self, username: str, db: Session):
         user_exist = db.query(UserModel).filter(
             UserModel.username == username).first()
         if not user_exist:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="User not found")
-        if user_exist.username != request.username:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail="Operation not allowed")
+                                detail="User does not exist")
 
         db.delete(user_exist)
         db.commit()
@@ -72,7 +78,8 @@ class UserService():
                 "access_token": access_token,
                 "token_type": "Bearer",
                 "user_id": dbUser.id,
-                "username": dbUser.username
+                "username": dbUser.username,
+                "profile_photo": dbUser.profile_photo
             }
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,

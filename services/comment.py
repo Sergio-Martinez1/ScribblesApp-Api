@@ -3,6 +3,7 @@ from models.models import Comment as CommentModel
 from schemas.comment import CommentIn, CommentToEdit
 from models.models import User as UserModel
 from fastapi import HTTPException, status
+from datetime import date
 
 
 class CommentService():
@@ -27,6 +28,7 @@ class CommentService():
 
         new_comment = CommentModel(content=comment.content,
                                    user_id=creator.id,
+                                   creation_date=date.today(),
                                    post_id=comment.post_id)
         db.add(new_comment)
         db.commit()

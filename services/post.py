@@ -18,6 +18,17 @@ class PostService():
                                 detail='No posts found')
         return posts
 
+    async def get_my_posts(self, username: str, db: Session, offset: int,
+                           limit: int):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        posts = db.query(PostModel).filter(
+            PostModel.user_id == user.id).offset(offset).limit(limit)
+        if not posts:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='Not posts found')
+        return posts
+
     async def get_post(self, id: int, db: Session):
         post = db.query(PostModel).filter(PostModel.id == id).first()
         if not post:
