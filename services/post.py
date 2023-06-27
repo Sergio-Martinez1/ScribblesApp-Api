@@ -43,8 +43,7 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Sign in first")
 
-        new_post = PostModel(title=post.title,
-                             thumbnail=post.thumbnail,
+        new_post = PostModel(thumbnail=post.thumbnail,
                              content=post.content,
                              publication_date=date.today(),
                              user_id=creator.id)
@@ -66,7 +65,6 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="Operation not allowed")
 
-        post.title = new_post.title
         post.thumbnail = new_post.thumbnail
         post.content = new_post.content
         post.tags = new_post.tags

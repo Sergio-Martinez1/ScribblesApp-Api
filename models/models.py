@@ -47,7 +47,6 @@ class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    title = Column(String)
     thumbnail = Column(String)
     content = Column(String)
     publication_date = Column(Date)

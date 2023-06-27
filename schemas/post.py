@@ -8,7 +8,6 @@ from .user import PlainUser
 
 
 class PostOut(BaseModel):
-    title: str = Field(min_length=1, max_length=1000)
     content: str = Field(min_length=1, max_length=1000)
     thumbnail: str = Field(None)
     publication_date: date = Field(...,
@@ -25,7 +24,6 @@ class PostOut(BaseModel):
 
 
 class PostIn(BaseModel):
-    title: str = Field(min_length=1, max_length=1000)
     content: str = Field(min_length=1, max_length=1000)
     thumbnail: str = Field(None)
     tags: List[Tag] = []
