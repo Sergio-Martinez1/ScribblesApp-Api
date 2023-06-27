@@ -4,19 +4,21 @@ from datetime import date
 from .tag import Tag
 from schemas.comment import CommentOut
 from .reaction import Reaction
+from .user import PlainUser
 
 
 class PostOut(BaseModel):
     title: str = Field(min_length=1, max_length=1000)
-    thumbnail: str = Field(None)
     content: str = Field(min_length=1, max_length=1000)
+    thumbnail: str = Field(None)
     publication_date: date = Field(...,
                                    example="2023-05-28",
                                    description="My date field")
     user_id: int
-    tags: List[Tag] = []
+    user: PlainUser
     reactions: List[Reaction] = []
     comments: List[CommentOut] = []
+    tags: List[Tag] = []
 
     class Config():
         orm_mode = True
@@ -24,8 +26,8 @@ class PostOut(BaseModel):
 
 class PostIn(BaseModel):
     title: str = Field(min_length=1, max_length=1000)
-    thumbnail: str = Field(None)
     content: str = Field(min_length=1, max_length=1000)
+    thumbnail: str = Field(None)
     tags: List[Tag] = []
 
     class Config():
