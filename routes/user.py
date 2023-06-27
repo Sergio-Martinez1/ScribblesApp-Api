@@ -38,8 +38,7 @@ async def get_user(id: int, db: Session = Depends(get_db)) -> PublicUser:
     return user
 
 
-@users_route.get("/delete",
-                 status_code=status.HTTP_200_OK)
+@users_route.delete("/", status_code=status.HTTP_200_OK)
 async def delete_user(db: Session = Depends(get_db),
                       user: str = Depends(authenticate)) -> dict:
     await UserService().delete_user(user, db)
@@ -66,10 +65,11 @@ async def sign_user_in(request: OAuth2PasswordRequestForm = Depends(),
 
 
 @users_route.post('/passsword', response_model=dict)
-async def password_change(password: PasswordChange,
-                          db: Session = Depends(get_db),
-                          username: str = Depends(authenticate)
-                          ) -> dict:
+async def password_change(
+    password: PasswordChange,
+    db: Session = Depends(get_db),
+    username: str = Depends(authenticate)
+) -> dict:
     await UserService().change_password(username, password.password,
                                         password.new_password, db)
     return JSONResponse(content={"message": "Password changed succesfully."},

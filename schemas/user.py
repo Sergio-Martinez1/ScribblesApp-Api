@@ -7,9 +7,6 @@ class NewUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     email: str
     password: str = Field(min_length=1, max_length=1000)
-    creation_date: date = Field(...,
-                                example="2023-05-28",
-                                description="User creation date")
     profile_photo: Optional[str] = None
     cover_photo: Optional[str] = None
     description: Optional[str] = None
@@ -26,7 +23,6 @@ class NewUser(BaseModel):
                 "username": "user",
                 "email": "user@email.com",
                 "password": "SecurePassword21@",
-                "creation_date": "2023-05-28",
                 "profile_photo": "http://image.com",
                 "cover_photo": "http://image.com",
                 "description": "Description example",

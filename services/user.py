@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
 from fastapi import HTTPException, status
+from datetime import date
 
 hash_password = HashPassword()
 
@@ -48,7 +49,7 @@ class UserService():
 
         hashed_password = hash_password.create_hash(request.password)
         request.password = hashed_password
-        new_user = UserModel(**request.dict())
+        new_user = UserModel(**request.dict(), creation_date=date.today())
         db.add(new_user)
         db.commit()
         return
