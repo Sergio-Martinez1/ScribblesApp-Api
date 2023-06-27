@@ -16,6 +16,13 @@ async def get_tags(db: Session = Depends(get_db)):
     return tags
 
 
+@tags_router.get('/top',
+                 status_code=status.HTTP_200_OK)
+async def get_top_tags(db: Session = Depends(get_db)):
+    tags = await TagService().get_top_tags(db, 3)
+    return tags
+
+
 @tags_router.post('/',
                   response_model=dict,
                   status_code=status.HTTP_201_CREATED)

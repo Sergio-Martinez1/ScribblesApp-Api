@@ -85,3 +85,19 @@ class UserService():
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Incorrect password")
         return
+
+    async def change_password(self, username: str, password: str,
+                              new_password: str, db: Session):
+        dbUser = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not dbUser:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User does not exist")
+        if hash_password.verify_hash(password, dbUser.password):
+            hashed_password = hash_password.create_hash(new_password)
+            dbUser.password = hashed_password
+            db.commit()
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Incorrect password")
+        return

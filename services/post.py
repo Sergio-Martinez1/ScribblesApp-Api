@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from models.models import Post as PostModel
 from models.models import User as UserModel
+from models.models import Tag as TagModel
 from schemas.post import PostIn
 from fastapi import HTTPException, status
 from datetime import date
@@ -27,6 +28,22 @@ class PostService():
         if not posts:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail='Not posts found')
+
+    async def get_posts_with_tag(self, db: Session, tag_content: str):
+        posts = db.query(PostModel).join(TagModel).filter(
+            TagModel.content == tag_content).all()
+
+        if not posts:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="No posts found with the specified tag")
+
+        return posts
+
+    async def get_posts_pagination(self, db: Session, limit: int, offset: int):
+        posts = db.query(PostModel).offset(offset).limit(limit).all()
+        if not posts:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='No posts found')
         return posts
 
     async def get_post(self, id: int, db: Session):

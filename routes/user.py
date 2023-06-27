@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, status, Depends
 from fastapi.responses import JSONResponse
 from schemas.user import NewUser, MyUser, PublicUser
+from schemas.user import PasswordChange
 from schemas.user import TokenResponse
 from sqlalchemy.orm import Session
 from db_config.database import get_db
@@ -62,3 +63,14 @@ async def sign_user_in(request: OAuth2PasswordRequestForm = Depends(),
 
     return await UserService().login_user(request.username, request.password,
                                           db)
+
+
+@users_route.post('/passsword', response_model=dict)
+async def password_change(password: PasswordChange,
+                          db: Session = Depends(get_db),
+                          username: str = Depends(authenticate)
+                          ) -> dict:
+    await UserService().change_password(username, password.password,
+                                        password.new_password, db)
+    return JSONResponse(content={"message": "Password changed succesfully."},
+                        status_code=status.HTTP_200_OK)

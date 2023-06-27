@@ -122,3 +122,8 @@ class TokenResponse(BaseModel):
     token_type: str
     user_id: int
     username: str
+
+
+class PasswordChange(BaseModel):
+    password: str = Field(min_length=1, max_length=1000)
+    new_password: str = Field(min_length=1, max_length=1000)
