@@ -1,9 +1,10 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from services.post import PostService
 from db_config.database import get_db
-from typing import List
+from typing import List, Optional
+from pydantic import Field
 from schemas.post import PostIn, PostOut
 from auth.authenticate import authenticate
 
@@ -17,6 +18,17 @@ async def get_posts(db: Session = Depends(get_db)) -> List[PostOut]:
 
     posts = await PostService().get_posts(db)
     return posts
+
+
+@posts_router.get('/myPosts',
+                  response_model=List[PostOut],
+                  status_code=status.HTTP_200_OK)
+async def get_my_posts(user: str = Depends(authenticate),
+                       db: Session = Depends(get_db),
+                       offset: int = Query(default=0, ge=0),
+                       limit: int = Query(default=10, ge=1)) -> List[PostOut]:
+    post = await PostService().get_my_posts(user, db, offset, limit)
+    return post
 
 
 @posts_router.get('/{id}',
