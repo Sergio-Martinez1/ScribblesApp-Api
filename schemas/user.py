@@ -35,6 +35,35 @@ class NewUser(BaseModel):
         orm_mode = True
 
 
+class UserUpdate(BaseModel):
+    username: str = Field(min_length=1, max_length=1000)
+    email: str
+    profile_photo: Optional[str] = None
+    cover_photo: Optional[str] = None
+    description: Optional[str] = None
+    personal_url: Optional[str] = None
+    location: Optional[str] = None
+    birthday: Optional[date] = Field(None,
+                                     example="2023-05-28",
+                                     description="User birthday")
+    prohibited_posts: Optional[List[int]] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "user",
+                "email": "user@email.com",
+                "profile_photo": "http://image.com",
+                "cover_photo": "http://image.com",
+                "description": "Description example",
+                "personal_url": "http://personal.com",
+                "location": "Washington D.C., United States",
+                "birthday": "2023-05-28",
+                "prohibited_posts": [15, 5, 103]
+            }
+        }
+        orm_mode = True
+
 class MyUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     email: str
