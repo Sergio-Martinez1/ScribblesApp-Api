@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, status, Depends
 from fastapi.responses import JSONResponse
-from schemas.user import NewUser, MyUser, PublicUser
+from schemas.user import NewUser, MyUser, PublicUser, UserUpdate
 from schemas.user import PasswordChange
 from schemas.user import TokenResponse
 from sqlalchemy.orm import Session
@@ -56,6 +56,17 @@ async def sign_user_up(user: NewUser, db: Session = Depends(get_db)) -> dict:
                         status_code=status.HTTP_201_CREATED)
 
 
+@users_route.put('/update',
+                 status_code=status.HTTP_200_OK,
+                 response_model=dict)
+async def user_update(request: UserUpdate,
+                      db: Session = Depends(get_db),
+                      user: str = Depends(authenticate)) -> dict:
+    await UserService().update_user(request, user, db)
+    return JSONResponse(content={"message": "User updated succesfully."},
+                        status_code=status.HTTP_201_CREATED)
+
+
 @users_route.post('/signin', response_model=TokenResponse)
 async def sign_user_in(request: OAuth2PasswordRequestForm = Depends(),
                        db: Session = Depends(get_db)) -> TokenResponse:
@@ -64,7 +75,7 @@ async def sign_user_in(request: OAuth2PasswordRequestForm = Depends(),
                                           db)
 
 
-@users_route.post('/passsword', response_model=dict)
+@users_route.post('/password', response_model=dict)
 async def password_change(
     password: PasswordChange,
     db: Session = Depends(get_db),
