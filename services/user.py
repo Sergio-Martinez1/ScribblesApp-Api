@@ -1,5 +1,5 @@
 from models.models import User as UserModel
-from schemas.user import NewUser, MyUser
+from schemas.user import NewUser, MyUser, UserUpdate
 from sqlalchemy.orm import Session
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
@@ -52,6 +52,35 @@ class UserService():
         new_user = UserModel(**request.dict(), creation_date=date.today())
         db.add(new_user)
         db.commit()
+        return
+
+    async def update_user(self, request: UserUpdate,
+                          username: str, db: Session):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User does not exist")
+
+        if request.username is not None:
+            user.username = request.username
+        if request.email is not None:
+            user.email = request.email
+        if request.profile_photo is not None:
+            user.profile_photo = request.profile_photo
+        if request.cover_photo is not None:
+            user.cover_photo = request.cover_photo
+        if request.description is not None:
+            user.description = request.description
+        if request.personal_url is not None:
+            user.personal_url = request.personal_url
+        if request.location is not None:
+            user.location = request.location
+        if request.birthday is not None:
+            user.birthday = request.birthday
+        db.add(user)
+        db.commit()
+        db.refresh(user)
         return
 
     async def delete_user(self, username: str, db: Session):
