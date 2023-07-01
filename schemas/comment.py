@@ -30,6 +30,7 @@ class CommentToEdit(BaseModel):
 
 
 class CommentOut(BaseModel):
+    id: int
     content: str = Field(default="", max_length=1000)
     creation_date: date = Field(...,
                                 example="2023-05-28",
