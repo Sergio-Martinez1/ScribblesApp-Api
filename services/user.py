@@ -62,8 +62,6 @@ class UserService():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="User does not exist")
 
-        if request.username is not None:
-            user.username = request.username
         if request.email is not None:
             user.email = request.email
         if request.profile_photo is not None:
@@ -130,4 +128,27 @@ class UserService():
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Incorrect password")
+        return
+
+    async def change_username(self, username: str, new_username: str,
+                              password: str, db: Session):
+        user = db.query(UserModel).filter(
+            UserModel.username == new_username).first()
+
+        if user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Username already exist")
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User does not exist")
+        if not hash_password.verify_hash(password, user.password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Incorrect password")
+        if new_username is not None:
+            user.username = new_username
+        db.add(user)
+        db.commit()
+        db.refresh(user)
         return
