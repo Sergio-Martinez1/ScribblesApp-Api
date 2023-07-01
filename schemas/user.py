@@ -36,8 +36,7 @@ class NewUser(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: str = Field(min_length=1, max_length=1000)
-    email: str
+    email: Optional[str] = None
     profile_photo: Optional[str] = None
     cover_photo: Optional[str] = None
     description: Optional[str] = None
@@ -46,12 +45,10 @@ class UserUpdate(BaseModel):
     birthday: Optional[date] = Field(None,
                                      example="2023-05-28",
                                      description="User birthday")
-    prohibited_posts: Optional[List[int]] = None
 
     class Config:
         schema_extra = {
             "example": {
-                "username": "user",
                 "email": "user@email.com",
                 "profile_photo": "http://image.com",
                 "cover_photo": "http://image.com",
@@ -59,7 +56,6 @@ class UserUpdate(BaseModel):
                 "personal_url": "http://personal.com",
                 "location": "Washington D.C., United States",
                 "birthday": "2023-05-28",
-                "prohibited_posts": [15, 5, 103]
             }
         }
         orm_mode = True
@@ -152,3 +148,8 @@ class TokenResponse(BaseModel):
 class PasswordChange(BaseModel):
     password: str = Field(min_length=1, max_length=1000)
     new_password: str = Field(min_length=1, max_length=1000)
+
+
+class UsernameChange(BaseModel):
+    username: str = Field(min_length=1, max_length=1000)
+    password: str = Field(min_length=1, max_length=1000)
