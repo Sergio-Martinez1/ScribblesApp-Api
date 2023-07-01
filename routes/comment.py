@@ -10,11 +10,19 @@ from auth.authenticate import authenticate
 comments_router = APIRouter(prefix='/comments', tags=['comments'])
 
 
-@comments_router.get('/',
+@comments_router.get('/all',
                      response_model=List[CommentOut],
                      status_code=status.HTTP_200_OK)
 async def get_comments(db: Session = Depends(get_db)):
     comments = await CommentService().get_comments(db)
+    return comments
+
+
+@comments_router.get('/{post_id}',
+                     response_model=List[CommentOut],
+                     status_code=status.HTTP_200_OK)
+async def get_comments_in_post(post_id: int, db: Session = Depends(get_db)):
+    comments = await CommentService().get_comments_in_post(post_id, db)
     return comments
 
 
@@ -25,7 +33,7 @@ async def create_comment(comment: CommentIn,
                          db: Session = Depends(get_db),
                          user: str = Depends(authenticate)):
     await CommentService().create_comment(comment, db, user)
-    return JSONResponse(content={"message": "Succesful comment created."},
+    return JSONResponse(content={"message": "Comment created successfully."},
                         status_code=status.HTTP_201_CREATED)
 
 
