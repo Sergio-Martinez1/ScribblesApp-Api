@@ -54,7 +54,13 @@ class Post(Base):
     user = relationship('User', back_populates='posts')
     tags = relationship('Tag', back_populates='post')
     reactions = relationship('Reaction', back_populates='post')
-    comments = relationship('Comment', back_populates='post')
+    comments = relationship('Comment',
+                            back_populates='post',
+                            order_by='Comment.id.desc()')
+
+    @property
+    def num_comments(self):
+        return len(self.comments)
 
 
 class Comment(Base):
