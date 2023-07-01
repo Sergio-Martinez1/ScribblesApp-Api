@@ -60,6 +60,7 @@ class UserUpdate(BaseModel):
         }
         orm_mode = True
 
+
 class MyUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     email: str
@@ -125,6 +126,7 @@ class PublicUser(BaseModel):
 
 
 class PlainUser(BaseModel):
+    id: int
     username: str = Field(min_length=1, max_length=1000)
     profile_photo: Optional[str] = None
 
@@ -143,6 +145,7 @@ class TokenResponse(BaseModel):
     token_type: str
     user_id: int
     username: str
+    profile_photo: Optional[str] = None
 
 
 class PasswordChange(BaseModel):
