@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from models.models import Comment as CommentModel
 from schemas.comment import CommentIn, CommentToEdit
 from models.models import User as UserModel
@@ -16,6 +17,15 @@ class CommentService():
         if not comments:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Comments not found")
+        return comments
+
+    async def get_comments_in_post(self, post_id: int, db: Session):
+        comments = db.query(CommentModel).filter(
+            CommentModel.post_id == post_id).order_by(desc(
+                CommentModel.id)).all()
+        if not comments:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Comments not found in this post")
         return comments
 
     async def create_comment(self, comment: CommentIn, db: Session,
