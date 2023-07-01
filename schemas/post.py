@@ -2,12 +2,12 @@ from pydantic import BaseModel, Field
 from typing import List
 from datetime import date
 from .tag import Tag
-from schemas.comment import CommentOut
-from .reaction import Reaction
+from .reaction import ReactionOut
 from .user import PlainUser
 
 
 class PostOut(BaseModel):
+    id: int
     content: str = Field(min_length=1, max_length=1000)
     thumbnail: str = Field(None)
     publication_date: date = Field(...,
@@ -15,9 +15,9 @@ class PostOut(BaseModel):
                                    description="My date field")
     user_id: int
     user: PlainUser
-    reactions: List[Reaction] = []
-    comments: List[CommentOut] = []
+    reactions: List[ReactionOut] = []
     tags: List[Tag] = []
+    num_comments: int
 
     class Config():
         orm_mode = True
