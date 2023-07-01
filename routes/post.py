@@ -30,23 +30,33 @@ async def get_my_posts(user: str = Depends(authenticate),
     return post
 
 
-@posts_router.get('/{tag_content}',
-                  response_model=List[PostOut],
-                  status_code=status.HTTP_200_OK)
-async def get_posts_with_tag(tag_content: str,
-                             db: Session = Depends(get_db)) -> List[PostOut]:
-    posts = await PostService().get_posts_with_tag(db, tag_content)
-    return posts
-
-
 @posts_router.get('/pagination',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
 async def get_posts_pagination(limit: int = Query(default=10, ge=1),
                                offset: int = Query(default=0, ge=0),
                                db: Session = Depends(get_db)) -> List[PostOut]:
-    posts = await PostService().get_posts_pagination(db, limit=limit,
+    posts = await PostService().get_posts_pagination(db,
+                                                     limit=limit,
                                                      offset=offset)
+    return posts
+
+
+@posts_router.get('/tags/{tag_content}',
+                  response_model=List[PostOut],
+                  status_code=status.HTTP_200_OK)
+async def get_posts_with_tag(
+        tag_content: str, db: Session = Depends(get_db)) -> List[PostOut]:
+    posts = await PostService().get_posts_with_tag(db, tag_content)
+    return posts
+
+
+@posts_router.get('/user/{user_id}',
+                  response_model=List[PostOut],
+                  status_code=status.HTTP_200_OK)
+async def get_posts_by_user_id(
+        user_id: int, db: Session = Depends(get_db)) -> List[PostOut]:
+    posts = await PostService().get_posts_by_user_id(db, user_id)
     return posts
 
 
