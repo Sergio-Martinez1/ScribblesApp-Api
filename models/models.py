@@ -52,11 +52,14 @@ class Post(Base):
     publication_date = Column(Date)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='posts')
-    tags = relationship('Tag', back_populates='post')
-    reactions = relationship('Reaction', back_populates='post')
+    tags = relationship('Tag', back_populates='post', cascade='all, delete')
+    reactions = relationship('Reaction',
+                             back_populates='post',
+                             cascade='all, delete')
     comments = relationship('Comment',
                             back_populates='post',
-                            order_by='Comment.id.desc()')
+                            order_by='Comment.id.desc()',
+                            cascade='all, delete')
 
     @property
     def num_comments(self):
