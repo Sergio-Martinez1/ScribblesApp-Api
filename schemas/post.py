@@ -26,7 +26,7 @@ class PostOut(BaseModel):
 class PostIn(BaseModel):
     content: str = Field(min_length=1, max_length=1000)
     thumbnail: str = Field(None)
-    tags: List[Tag] = []
+    tags: List[str] = []
 
     class Config():
         orm_mode = True

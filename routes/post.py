@@ -26,8 +26,11 @@ async def get_my_posts(user: str = Depends(authenticate),
                        db: Session = Depends(get_db),
                        offset: int = Query(default=0, ge=0),
                        limit: int = Query(default=10, ge=1)) -> List[PostOut]:
-    post = await PostService().get_my_posts(user, db, offset, limit)
-    return post
+    posts = await PostService().get_my_posts(username=user,
+                                             db=db,
+                                             offset=offset,
+                                             limit=limit)
+    return posts
 
 
 @posts_router.get('/pagination',
