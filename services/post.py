@@ -106,10 +106,22 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="Operation not allowed")
 
+        if len(post.tags) > 0:
+            for tag in post.tags:
+                db.delete(tag)
+                db.commit()
+        if len(new_post.tags) > 0:
+            for tag in new_post.tags:
+                new_tag = TagModel(content=tag, post_id=id)
+                db.add(new_tag)
+                db.commit()
+
         post.thumbnail = new_post.thumbnail
         post.content = new_post.content
-        post.tags = new_post.tags
+        db.add(post)
         db.commit()
+        db.refresh(post)
+
         return
 
     async def delete_post(self, db: Session, id: int, username: str):
