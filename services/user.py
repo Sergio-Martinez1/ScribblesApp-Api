@@ -47,6 +47,13 @@ class UserService():
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Username already exist")
 
+        email = db.query(UserModel).filter(
+            UserModel.email == request.email).first()
+
+        if email:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Email already exist")
+
         hashed_password = hash_password.create_hash(request.password)
         request.password = hashed_password
         new_user = UserModel(**request.dict(), creation_date=date.today())
