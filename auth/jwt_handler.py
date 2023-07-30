@@ -28,7 +28,7 @@ def verify_access_token(token: str):
                                 detail="No access token supplied")
 
         if datetime.utcnow() > datetime.utcfromtimestamp(expire):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Token expired")
 
         return data
