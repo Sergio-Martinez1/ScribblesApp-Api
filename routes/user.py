@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, status, Depends
 from fastapi.responses import JSONResponse
-from schemas.user import NewUser, MyUser, PublicUser, UserUpdate
+from schemas.user import NewUser, MyUser, PublicUser, UserUpdate, PlainMyUser
 from schemas.user import PasswordChange, UsernameChange
 from schemas.user import TokenResponse
 from sqlalchemy.orm import Session
@@ -28,6 +28,15 @@ async def get_my_user(db: Session = Depends(get_db),
                       user: str = Depends(authenticate)) -> MyUser:
     myUser = await UserService().get_my_user(user, db)
     return myUser
+
+
+@users_route.get("/plainMyUser",
+                 response_model=PlainMyUser,
+                 status_code=status.HTTP_200_OK)
+async def get_plain_my_user(db: Session = Depends(get_db),
+                            user: str = Depends(authenticate)) -> PlainMyUser:
+    plainMyUser = await UserService().get_plain_my_user(user, db)
+    return plainMyUser
 
 
 @users_route.get("/{id}",
@@ -59,9 +68,11 @@ async def sign_user_up(user: NewUser, db: Session = Depends(get_db)) -> dict:
 @users_route.put('/update',
                  status_code=status.HTTP_200_OK,
                  response_model=dict)
-async def user_update(request: UserUpdate,
-                      db: Session = Depends(get_db),
-                      user: str = Depends(authenticate)) -> dict:
+async def user_update(
+    request: UserUpdate,
+    db: Session = Depends(get_db),
+    user: str = Depends(authenticate)
+) -> dict:
     await UserService().update_user(request, user, db)
     return JSONResponse(content={"message": "User updated succesfully."},
                         status_code=status.HTTP_201_CREATED)
