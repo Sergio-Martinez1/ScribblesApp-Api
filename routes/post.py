@@ -19,6 +19,21 @@ async def get_posts(db: Session = Depends(get_db)) -> List[PostOut]:
     return posts
 
 
+@posts_router.get('/home',
+                  response_model=List[PostOut],
+                  status_code=status.HTTP_200_OK)
+async def get_home_posts(user: str = Depends(authenticate),
+                         db: Session = Depends(get_db),
+                         offset: int = Query(default=0, ge=0),
+                         limit: int = Query(default=10,
+                                            ge=1)) -> List[PostOut]:
+    posts = await PostService().get_home_posts(username=user,
+                                               db=db,
+                                               offset=offset,
+                                               limit=limit)
+    return posts
+
+
 @posts_router.get('/myPosts',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
@@ -105,4 +120,13 @@ async def delete_post(
 
     await PostService().delete_post(db, id, user)
     return JSONResponse(content={'message': 'Post sucessfully deleted'},
+                        status_code=status.HTTP_200_OK)
+
+
+@posts_router.post('/dont_show_post/{id}', status_code=status.HTTP_200_OK)
+async def dont_show_post(id: int,
+                         db: Session = Depends(get_db),
+                         user: str = Depends(authenticate)):
+    await PostService().dont_show_post(db=db, id=id, username=user)
+    return JSONResponse(content={'message': 'Post sucessfully added'},
                         status_code=status.HTTP_200_OK)
