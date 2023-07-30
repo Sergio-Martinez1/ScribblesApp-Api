@@ -1,7 +1,9 @@
-from sqlalchemy import Column, Integer, String, Date, ARRAY
+from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.dialects.postgresql import ARRAY
 from db_config.database import Base
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.mutable import MutableList
 
 
 class User(Base):
@@ -19,10 +21,20 @@ class User(Base):
     personal_url = Column(String, nullable=True)
     location = Column(String, nullable=True)
     birthday = Column(Date, nullable=True)
-    prohibited_posts = Column(ARRAY(Integer), nullable=True)
+    prohibited_posts = Column(MutableList.as_mutable(ARRAY(Integer)),
+                              nullable=True)
     # A revision
-    posts = relationship('Post', back_populates='user')
-    comments = relationship('Comment', back_populates='user')
+    reactions = relationship('Reaction',
+                             back_populates='user',
+                             cascade='all, delete')
+    comments = relationship('Comment',
+                            back_populates='user',
+                            order_by='Comment.id.desc()',
+                            cascade='all, delete')
+    posts = relationship('Post',
+                         back_populates='user',
+                         order_by='Post.id.desc()',
+                         cascade='all, delete')
 
 
 class Tag(Base):
@@ -41,14 +53,15 @@ class Reaction(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     post_id = Column(Integer, ForeignKey('posts.id'))
     post = relationship('Post', back_populates='reactions')
+    user = relationship('User', back_populates='reactions')
 
 
 class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    thumbnail = Column(String)
-    content = Column(String)
+    thumbnail = Column(String, nullable=True)
+    content = Column(String, nullable=True)
     publication_date = Column(Date)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='posts')
