@@ -95,6 +95,24 @@ class MyUser(BaseModel):
         orm_mode = True
 
 
+class PlainMyUser(BaseModel):
+    id: int
+    username: str = Field(min_length=1, max_length=1000)
+    profile_photo: Optional[str] = None
+    prohibited_posts: Optional[List[int]] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": 1,
+                "username": "user",
+                "profile_photo": "http://image.com",
+                "prohibited_posts": [15, 5, 103]
+            }
+        }
+        orm_mode = True
+
+
 class PublicUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     creation_date: date = Field(...,
@@ -143,9 +161,6 @@ class PlainUser(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
-    user_id: int
-    username: str
-    profile_photo: Optional[str] = None
 
 
 class PasswordChange(BaseModel):
