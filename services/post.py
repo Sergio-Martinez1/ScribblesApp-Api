@@ -20,6 +20,22 @@ class PostService():
                                 detail='No posts found')
         return posts
 
+    async def get_home_posts(self, username: str, db: Session, offset: int,
+                             limit: int):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='User does not exist')
+        posts = db.query(PostModel).filter(
+            PostModel.id.not_in(
+                user.prohibited_posts if user.prohibited_posts else [])
+        ).order_by(desc(PostModel.id)).offset(offset).limit(limit).all()
+        if not posts:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='Not posts found')
+        return posts
+
     async def get_my_posts(self, username: str, db: Session, offset: int,
                            limit: int):
         user = db.query(UserModel).filter(
@@ -76,21 +92,28 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Sign in first")
 
-        new_post = PostModel(thumbnail=post.thumbnail,
-                             content=post.content,
+        new_post = PostModel(content=None,
+                             thumbnail=None,
                              publication_date=date.today(),
                              user_id=creator.id)
+
+        if post.content is not None:
+            new_post.content = post.content
+        if post.thumbnail is not None:
+            new_post.thumbnail = post.thumbnail
+
         db.add(new_post)
         db.commit()
         db.refresh(new_post)
-        if len(post.tags) > 0:
+
+        if post.tags:
             post_created = db.query(PostModel).filter(
                 PostModel.user_id == creator.id).order_by(desc(
                     PostModel.id)).first()
             for tag in post.tags:
                 new_tag = TagModel(content=tag, post_id=post_created.id)
                 db.add(new_tag)
-                db.commit()
+            db.commit()
         return
 
     async def update_post(self, db: Session, new_post: PostIn, id: int,
@@ -106,21 +129,24 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="Operation not allowed")
 
-        if len(post.tags) > 0:
+        if post.tags:
             for tag in post.tags:
                 db.delete(tag)
-                db.commit()
-        if len(new_post.tags) > 0:
+        if new_post.tags:
             for tag in new_post.tags:
                 new_tag = TagModel(content=tag, post_id=id)
                 db.add(new_tag)
-                db.commit()
 
-        post.thumbnail = new_post.thumbnail
-        post.content = new_post.content
+        post.content = None
+        post.thumbnail = None
+
+        if new_post.content is not None:
+            post.content = new_post.content
+        if new_post.thumbnail is not None:
+            post.thumbnail = new_post.thumbnail
+
         db.add(post)
         db.commit()
-        db.refresh(post)
 
         return
 
@@ -137,5 +163,28 @@ class PostService():
                                 detail="Operation not allowed")
 
         db.delete(post)
+        db.commit()
+        return
+
+    async def dont_show_post(self, db: Session, id: int, username: str):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User not found")
+        post = db.query(PostModel).filter(PostModel.id == id).first()
+        if not post:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Post does not exist")
+        if id in user.prohibited_posts:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Post already added")
+
+        if user.prohibited_posts is None:
+            user.prohibited_posts = []
+
+        user.prohibited_posts += [id]
+
+        db.add(user)
         db.commit()
         return
