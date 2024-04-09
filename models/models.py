@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, DateTime, TIMESTAMP
 from sqlalchemy.dialects.postgresql import ARRAY
 from db_config.database import Base
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.sql import func
 
 
 class User(Base):
@@ -13,14 +14,14 @@ class User(Base):
     username = Column(String)
     password = Column(String)
     email = Column(String)
-    creation_date = Column(Date)
+    creation_date = Column(DateTime(timezone=True), server_default=func.now())
 
     profile_photo = Column(String, nullable=True)
     cover_photo = Column(String, nullable=True)
     description = Column(String, nullable=True)
     personal_url = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    birthday = Column(Date, nullable=True)
+    birthday = Column(DateTime, nullable=True)
     prohibited_posts = Column(MutableList.as_mutable(ARRAY(Integer)),
                               nullable=True)
     # A revision
@@ -62,7 +63,8 @@ class Post(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     thumbnail = Column(String, nullable=True)
     content = Column(String, nullable=True)
-    publication_date = Column(Date)
+    publication_date = Column(DateTime(timezone=True),
+                              server_default=func.now())
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='posts')
     tags = relationship('Tag', back_populates='post', cascade='all, delete')
@@ -86,6 +88,6 @@ class Comment(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     post_id = Column(Integer, ForeignKey('posts.id'))
     content = Column(String)
-    creation_date = Column(Date)
+    creation_date = Column(DateTime(timezone=True), server_default=func.now())
     user = relationship('User', back_populates='comments')
     post = relationship('Post', back_populates='comments')
