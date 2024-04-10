@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from datetime import date
+from datetime import datetime, date
 
 
 class NewUser(BaseModel):
@@ -64,9 +64,9 @@ class UserUpdate(BaseModel):
 class MyUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     email: str
-    creation_date: date = Field(...,
-                                example="2023-05-28",
-                                description="User creation date")
+    creation_date: datetime = Field(...,
+                                    example="2024-03-22T01:50:25.664273+00:00",
+                                    description="User creation date")
     profile_photo: Optional[str] = None
     cover_photo: Optional[str] = None
     description: Optional[str] = None
@@ -115,9 +115,9 @@ class PlainMyUser(BaseModel):
 
 class PublicUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
-    creation_date: date = Field(...,
-                                example="2023-05-28",
-                                description="User creation date")
+    creation_date: datetime = Field(...,
+                                    example="2024-03-22T01:50:25.664273+00:00",
+                                    description="User creation date")
     profile_photo: Optional[str] = None
     cover_photo: Optional[str] = None
     description: Optional[str] = None
