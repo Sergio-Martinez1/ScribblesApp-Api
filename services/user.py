@@ -65,7 +65,7 @@ class UserService():
 
         hashed_password = hash_password.create_hash(request.password)
         request.password = hashed_password
-        new_user = UserModel(**request.dict(), creation_date=date.today())
+        new_user = UserModel(**request.dict())
         db.add(new_user)
         db.commit()
         return

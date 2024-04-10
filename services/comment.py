@@ -38,7 +38,6 @@ class CommentService():
 
         new_comment = CommentModel(content=comment.content,
                                    user_id=creator.id,
-                                   creation_date=date.today(),
                                    post_id=comment.post_id)
         db.add(new_comment)
         db.commit()

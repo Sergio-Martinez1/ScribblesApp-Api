@@ -5,7 +5,6 @@ from models.models import User as UserModel
 from models.models import Tag as TagModel
 from schemas.post import PostIn
 from fastapi import HTTPException, status
-from datetime import date
 
 
 class PostService():
@@ -94,7 +93,6 @@ class PostService():
 
         new_post = PostModel(content=None,
                              thumbnail=None,
-                             publication_date=date.today(),
                              user_id=creator.id)
 
         if post.content is not None:
