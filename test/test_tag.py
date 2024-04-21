@@ -1,5 +1,6 @@
 import httpx
 import pytest
+import pytest_asyncio
 from models.models import User
 from models.models import Post
 from models.models import Tag
@@ -11,7 +12,7 @@ from db_config.database import SessionLocal
 db = SessionLocal()
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture(scope="module")
 async def mock_user() -> User:
     test_password = "123456"
     hashed_password = HashPassword().create_hash(test_password)
@@ -19,7 +20,7 @@ async def mock_user() -> User:
         username="sergio",
         email="sergio@mail.com",
         password=hashed_password,
-        image="http://image.com",
+        profile_photo="http://image.com",
     )
     db.add(userModel)
     db.commit()
@@ -29,17 +30,15 @@ async def mock_user() -> User:
     yield stored_user
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture(scope="module")
 async def mock_access_token(mock_user: User) -> str:
     return create_access_token(mock_user.username)
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture(scope="module")
 async def mock_post(mock_user: User) -> Post:
-    new_post = Post(title="Title for a test post",
-                    thumbnail="http://image.com",
+    new_post = Post(thumbnail="http://image.com",
                     content="Some content for a test post",
-                    publication_date=date.today(),
                     user_id=mock_user.id)
     db.add(new_post)
     db.commit()
@@ -48,7 +47,7 @@ async def mock_post(mock_user: User) -> Post:
     yield stored_post
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture(scope="module")
 async def mock_tag(mock_post: Post) -> Tag:
     tagModel = Tag(
         content="Tech",

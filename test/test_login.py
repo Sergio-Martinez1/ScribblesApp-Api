@@ -1,24 +1,25 @@
 import httpx
 import pytest
+import pytest_asyncio
 from models.models import User
 from db_config.database import SessionLocal
 from auth.hash_password import HashPassword
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture(scope="module")
 async def mock_user() -> User:
     userSchema = User(
         username="sergio",
         email="sergio@mail.com",
         password="123456",
-        image="http://image.com",
+        profile_photo="http://image.com",
     )
     hashed_password = HashPassword().create_hash("123456")
     userModel = User(
         username="sergio",
         email="sergio@mail.com",
         password=hashed_password,
-        image="http://image.com",
+        profile_photo="http://image.com",
     )
     db = SessionLocal()
     db.add(userModel)
@@ -33,7 +34,7 @@ async def test_sign_new_user(default_client: httpx.AsyncClient) -> None:
         "username": "pepe",
         "email": "pepe@mail.com",
         "password": "123456",
-        "image": "http://image.com"
+        "profile_photo": "http://image.com"
     }
     headers = {
         "accept": "application/json",
