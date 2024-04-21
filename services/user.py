@@ -79,19 +79,40 @@ class UserService():
                                 detail="User does not exist")
 
         if request.email is not None:
-            user.email = request.email
+            if request.email is '':
+                user.email = None
+            else:
+                user.email = request.email
         if request.profile_photo is not None:
-            user.profile_photo = request.profile_photo
+            if request.profile_photo is '':
+                user.profile_photo = None
+            else:
+                user.profile_photo = request.profile_photo
         if request.cover_photo is not None:
-            user.cover_photo = request.cover_photo
+            if request.cover_photo is '':
+                user.cover_photo = None
+            else:
+                user.cover_photo = request.cover_photo
         if request.description is not None:
-            user.description = request.description
+            if request.description is '':
+                user.description = None
+            else:
+                user.description = request.description
         if request.personal_url is not None:
-            user.personal_url = request.personal_url
+            if request.personal_url is '':
+                user.personal_url = None
+            else:
+                user.personal_url = request.personal_url
         if request.location is not None:
-            user.location = request.location
+            if request.location is '':
+                user.location = None
+            else:
+                user.location = request.location
         if request.birthday is not None:
-            user.birthday = request.birthday
+            if request.birthday is '':
+                user.birthday = None
+            else:
+                user.birthday = request.birthday
         db.add(user)
         db.commit()
         db.refresh(user)
