@@ -16,7 +16,7 @@ class Settings(BaseSettings):
             return self.DATABASE_URL
 
     class Config:
-        env_file = ".env.prod"
+        env_file = ".env"
 
 
 settings = Settings()
