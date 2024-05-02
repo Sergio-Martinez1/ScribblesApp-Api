@@ -1,10 +1,9 @@
 from models.models import User as UserModel
-from schemas.user import NewUser, MyUser, UserUpdate
+from schemas.user import NewUser, UserUpdate
 from sqlalchemy.orm import Session
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
 from fastapi import HTTPException, status
-from datetime import date
 
 hash_password = HashPassword()
 
@@ -79,37 +78,37 @@ class UserService():
                                 detail="User does not exist")
 
         if request.email is not None:
-            if request.email is '':
+            if request.email == '':
                 user.email = None
             else:
                 user.email = request.email
         if request.profile_photo is not None:
-            if request.profile_photo is '':
+            if request.profile_photo == '':
                 user.profile_photo = None
             else:
                 user.profile_photo = request.profile_photo
         if request.cover_photo is not None:
-            if request.cover_photo is '':
+            if request.cover_photo == '':
                 user.cover_photo = None
             else:
                 user.cover_photo = request.cover_photo
         if request.description is not None:
-            if request.description is '':
+            if request.description == '':
                 user.description = None
             else:
                 user.description = request.description
         if request.personal_url is not None:
-            if request.personal_url is '':
+            if request.personal_url == '':
                 user.personal_url = None
             else:
                 user.personal_url = request.personal_url
         if request.location is not None:
-            if request.location is '':
+            if request.location == '':
                 user.location = None
             else:
                 user.location = request.location
         if request.birthday is not None:
-            if request.birthday is '':
+            if request.birthday == '':
                 user.birthday = None
             else:
                 user.birthday = request.birthday
