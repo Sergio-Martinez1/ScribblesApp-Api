@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_SECONDS: int = None
     BUCKET_URL: str = None
     BUCKET_NAME: str = None
+    GOOGLE_APPLICATION_CREDENTIALS: str = None
 
     def get_db_url(self):
         return self.DATABASE_URL
