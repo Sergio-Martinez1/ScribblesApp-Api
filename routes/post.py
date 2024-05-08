@@ -63,9 +63,14 @@ async def get_posts_pagination(limit: int = Query(default=10, ge=1),
 @posts_router.get('/tags/{tag_content}',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
-async def get_posts_with_tag(
-        tag_content: str, db: Session = Depends(get_db)) -> List[PostOut]:
-    posts = await PostService().get_posts_with_tag(db, tag_content)
+async def get_posts_with_tag(tag_content: str,
+                             limit: int = Query(default=10, ge=1),
+                             offset: int = Query(default=0, ge=0),
+                             db: Session = Depends(get_db)) -> List[PostOut]:
+    posts = await PostService().get_posts_with_tag(db=db,
+                                                   tag_content=tag_content,
+                                                   limit=limit,
+                                                   offset=offset)
     return posts
 
 
