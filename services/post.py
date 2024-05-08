@@ -49,9 +49,10 @@ class PostService():
                                 detail='Not posts found')
         return posts
 
-    async def get_posts_with_tag(self, db: Session, tag_content: str):
+    async def get_posts_with_tag(self, db: Session, tag_content: str,
+                                 limit: int, offset: int):
         posts = db.query(PostModel).join(TagModel).filter(
-            TagModel.content == tag_content).all()
+            TagModel.content == tag_content).offset(offset).limit(limit).all()
 
         if not posts:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -91,9 +92,7 @@ class PostService():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Sign in first")
 
-        new_post = PostModel(content=None,
-                             thumbnail=None,
-                             user_id=creator.id)
+        new_post = PostModel(content=None, thumbnail=None, user_id=creator.id)
 
         if post.content is not None:
             new_post.content = post.content
@@ -174,7 +173,7 @@ class PostService():
         if not post:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Post does not exist")
-        if id in user.prohibited_posts:
+        if user.prohibited_posts is not None and id in user.prohibited_posts:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Post already added")
 
