@@ -77,9 +77,14 @@ async def get_posts_with_tag(tag_content: str,
 @posts_router.get('/user/{user_id}',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
-async def get_posts_by_user_id(
-        user_id: int, db: Session = Depends(get_db)) -> List[PostOut]:
-    posts = await PostService().get_posts_by_user_id(db, user_id)
+async def get_posts_by_user_id(user_id: int,
+                               limit: int = Query(default=10, ge=1),
+                               offset: int = Query(default=0, ge=0),
+                               db: Session = Depends(get_db)) -> List[PostOut]:
+    posts = await PostService().get_posts_by_user_id(db,
+                                                     user_id,
+                                                     limit=limit,
+                                                     offset=offset)
     return posts
 
 
