@@ -24,6 +24,8 @@ class User(Base):
     birthday = Column(DateTime, nullable=True)
     prohibited_posts = Column(MutableList.as_mutable(ARRAY(Integer)),
                               nullable=True)
+    dark_mode = Column(String, nullable=True)
+    color_scheme = Column(String, nullable = True)
     # A revision
     reactions = relationship('Reaction',
                              back_populates='user',

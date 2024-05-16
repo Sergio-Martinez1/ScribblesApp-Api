@@ -16,6 +16,7 @@ class NewUser(BaseModel):
                                      example="2023-05-28",
                                      description="User birthday")
     prohibited_posts: Optional[List[int]] = None
+    
 
     class Config:
         schema_extra = {
@@ -45,6 +46,8 @@ class UserUpdate(BaseModel):
     birthday: Optional[date] = Field(None,
                                      example="2023-05-28",
                                      description="User birthday")
+    dark_mode: Optional[str] = None
+    color_scheme: Optional[str] = None
 
     class Config:
         schema_extra = {
@@ -76,6 +79,8 @@ class MyUser(BaseModel):
                                      example="2023-05-28",
                                      description="User birthday")
     prohibited_posts: Optional[List[int]] = None
+    dark_mode: Optional[str] = None
+    color_scheme: Optional[str] = None
 
     class Config:
         schema_extra = {
@@ -100,6 +105,8 @@ class PlainMyUser(BaseModel):
     username: str = Field(min_length=1, max_length=1000)
     profile_photo: Optional[str] = None
     prohibited_posts: Optional[List[int]] = None
+    dark_mode: Optional[str] = None
+    color_scheme: Optional[str] = None
 
     class Config:
         schema_extra = {
