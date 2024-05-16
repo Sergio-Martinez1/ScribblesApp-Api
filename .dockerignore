@@ -7,4 +7,3 @@ test/
 .coverage
 .git
 htmlcov
-ServiceKey_GoogleCloud.json
