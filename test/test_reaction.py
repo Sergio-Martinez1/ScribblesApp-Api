@@ -64,8 +64,8 @@ async def test_create_reaction(default_client: httpx.AsyncClient,
     print(response.content)
     assert response.status_code == 200
     assert response.json() == test_response
-    
-    
+
+
 @pytest.mark.asyncio
 async def test_get_reactions(default_client: httpx.AsyncClient) -> None:
     response = await default_client.get("/reactions/")

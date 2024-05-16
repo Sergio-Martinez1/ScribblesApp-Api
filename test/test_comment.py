@@ -1,7 +1,6 @@
 import httpx
 import pytest
 import pytest_asyncio
-from datetime import date
 from auth.jwt_handler import create_access_token
 from auth.hash_password import HashPassword
 from db_config.database import SessionLocal
