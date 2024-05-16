@@ -112,6 +112,16 @@ class UserService():
                 user.birthday = None
             else:
                 user.birthday = request.birthday
+        if request.dark_mode is not None:
+            if request.dark_mode == '':
+                user.dark_mode = None
+            else:
+                user.dark_mode = request.dark_mode
+        if request.color_scheme is not None:
+            if request.color_scheme == '':
+                user.color_scheme = None
+            else:
+                user.color_scheme = request.color_scheme
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -159,7 +169,7 @@ class UserService():
             dbUser.password = hashed_password
             db.commit()
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="Incorrect password")
         return
 
