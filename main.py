@@ -7,7 +7,6 @@ from routes.post import posts_router
 from routes.files import files_router
 from db_config.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 app = FastAPI()
@@ -25,7 +24,6 @@ app.include_router(tags_router)
 app.include_router(comments_router)
 app.include_router(posts_router)
 app.include_router(files_router)
-app.mount('/files', StaticFiles(directory='files'), name='files')
 
 Base.metadata.create_all(bind=engine)
 
