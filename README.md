@@ -18,11 +18,76 @@ If want more information about the schemas and routes can check the OpenApi docu
 
 ## Getting started
 
-1. [Run the app with docker](#run-the-app-with-docker) 👈 choose this if confused or uncertain
+1. [Run the app with docker compose](#run-the-app-with-docker)
 2. [Manual installation](#manual-installation)
 
 ## Run the app with docker compose
-
+Create a project folder and go inside:
+```
+mkdir scribblesapp && cd scribblesapp
+```
+Clone the repository:
+```
+git clone https://github.com/Sergio-Martinez1/ScribblesApp-Api.git
+```
+Create a .env file inside Scribbles-Api folder and open it with the editor:
+```
+touch ./ScribblesApp-Api/.env && nano ./ScribblesApp-Api/.env
+```
+Paste this inside and save it with **Ctrl-x**:
+```
+DATABASE_URL=postgresql://user:password@db:5432/scribbles_db
+SECRET_KEY=randomSecretKey
+ACCESS_TOKEN_EXPIRE_SECONDS=3600
+BUCKET_URL=
+BUCKET_NAME=
+GOOGLE_APPLICATION_CREDENTIALS=
+```
+Create a db folder:
+```
+mkdir db
+```
+Create a .env inside db folder and open it with the editor:
+```
+touch ./db/.env && nano ./db/.env
+```
+Paste this inside and save it with **Ctrl-x**:
+```
+PGUSER=user
+POSTGRES_DB=scribbles_db
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+```
+Create a docker compose file and open it with the editor:
+```
+touch docker-compose.yml && nano ./docker-compose.yml
+```
+Put this data inside the docker-compose.yml and save it with **Ctrl-x**:
+```
+services:
+  api:
+    build: ./ScribblesApp-Api
+    ports:
+      - 8080:8080
+    env_file:
+      - ./ScribblesApp-Api/.env
+  db:
+    image: postgres:13
+    env_file:
+      - ./db/.env
+    volumes:
+      - scribbles_db:/var/lib/postgresql/data
+volumes:
+  scribbles_db:
+```
+Run the app:
+```
+docker compose up
+```
+Go to the api url in your browser:
+```
+http://127.0.0.1:8080/docs
+```
 ## Manual installation
 #### Setting the database
 - **If already have a database go to ->** [Setting the api](#setting-the-api)
@@ -118,11 +183,15 @@ wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1b1gw
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1M2RMqBbKF9TgnsuPLv3pxlgUe0ZcvxPP' -O reactions.sql &&\
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=19uQQz27UBfv7t14FA_lYbmRLSFx1J0NQ' -O tags.sql
 ```
-**With your database and api running** copy your data into your postgres container:
+Check the name of your running postgresql container:
+```
+docker ps
+```
+**With your database and api running** copy your data into your postgres container (*change "postgres" with your database container name*):
 ```
 for f in ./*sql; do docker cp $f postgres:/usr/src/; done
 ```
-Once your data is inside your container, the next step is to insert your data into your database:
+Once your data is inside your container, the next step is to insert your data into your database (*change "postgres" with your database container name*):
 ```
 docker exec -it postgres psql -U user -d scribbles_db -f /usr/src/users.sql -f /usr/src/posts.sql -f /usr/src/comments.sql -f /usr/src/reactions.sql -f /usr/src/tags.sql
 ```
