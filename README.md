@@ -20,6 +20,7 @@ If want more information about the schemas and routes can check the OpenApi docu
 
 1. [Run the app with docker compose](#run-the-app-with-docker)
 2. [Manual installation](#manual-installation)
+3. [Setting data to the database](#setting-data-to-the-database)
 
 ## Run the app with docker compose
 Create a project folder and go inside:
