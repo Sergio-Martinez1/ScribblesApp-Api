@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     BUCKET_URL: str = None
     BUCKET_NAME: str = None
     GOOGLE_APPLICATION_CREDENTIALS: str = None
+    INSTANCE_CONNECTION_NAME: str = None
+    CLOUD_SQL_USER: str = None
+    CLOUD_SQL_PASSWORD: str = None
+    POSTGRES_DB: str = None
+    SQLALCHEMY_DATABASE_URL: str = None
 
     def get_db_url(self):
         return self.DATABASE_URL
