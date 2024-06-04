@@ -31,6 +31,7 @@ async def get_home_posts(user: str = Depends(authenticate),
                                                db=db,
                                                offset=offset,
                                                limit=limit)
+
     return posts
 
 
@@ -63,10 +64,12 @@ async def get_posts_pagination(limit: int = Query(default=10, ge=1),
 @posts_router.get('/tags/{tag_content}',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
-async def get_posts_with_tag(tag_content: str,
-                             limit: int = Query(default=10, ge=1),
-                             offset: int = Query(default=0, ge=0),
-                             db: Session = Depends(get_db)) -> List[PostOut]:
+async def get_posts_with_tag(
+    tag_content: str,
+    limit: int = Query(default=10, ge=1),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db)
+) -> List[PostOut]:
     posts = await PostService().get_posts_with_tag(db=db,
                                                    tag_content=tag_content,
                                                    limit=limit,
@@ -74,13 +77,34 @@ async def get_posts_with_tag(tag_content: str,
     return posts
 
 
+@posts_router.get('/tags/{tag_content}/personal',
+                  response_model=List[PostOut],
+                  status_code=status.HTTP_200_OK)
+async def get_posts_with_tag_personal(
+    tag_content: str,
+    user: str = Depends(authenticate),
+    limit: int = Query(default=10, ge=1),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db)
+) -> List[PostOut]:
+    posts = await PostService().get_posts_with_tag_personal(
+        username=user,
+        db=db,
+        tag_content=tag_content,
+        limit=limit,
+        offset=offset)
+    return posts
+
+
 @posts_router.get('/user/{user_id}',
                   response_model=List[PostOut],
                   status_code=status.HTTP_200_OK)
-async def get_posts_by_user_id(user_id: int,
-                               limit: int = Query(default=10, ge=1),
-                               offset: int = Query(default=0, ge=0),
-                               db: Session = Depends(get_db)) -> List[PostOut]:
+async def get_posts_by_user_id(
+    user_id: int,
+    limit: int = Query(default=10, ge=1),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db)
+) -> List[PostOut]:
     posts = await PostService().get_posts_by_user_id(db,
                                                      user_id,
                                                      limit=limit,
@@ -97,30 +121,30 @@ async def get_post(id: int, db: Session = Depends(get_db)) -> PostOut:
 
 
 @posts_router.post('/',
-                   response_model=dict,
+                   response_model=PostOut,
                    status_code=status.HTTP_201_CREATED)
 async def create_post(
     post: PostIn,
     db: Session = Depends(get_db),
     user: str = Depends(authenticate)
-) -> dict:
+) -> PostOut:
 
-    await PostService().create_post(db, post, user)
-    return JSONResponse(content={'message': 'Post sucessfully created'},
-                        status_code=status.HTTP_201_CREATED)
+    new_post = await PostService().create_post(db, post, user)
+    return new_post
 
 
-@posts_router.put('/{id}', response_model=dict, status_code=status.HTTP_200_OK)
+@posts_router.put('/{id}',
+                  response_model=PostOut,
+                  status_code=status.HTTP_200_OK)
 async def update_post(
     id: int,
     post: PostIn,
     db: Session = Depends(get_db),
     user: str = Depends(authenticate)
-) -> dict:
+) -> PostOut:
 
-    await PostService().update_post(db, post, id, user)
-    return JSONResponse(content={'message': 'Post sucessfully updated'},
-                        status_code=status.HTTP_200_OK)
+    updated_post = await PostService().update_post(db, post, id, user)
+    return updated_post
 
 
 @posts_router.delete('/{id}', status_code=status.HTTP_200_OK)
