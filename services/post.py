@@ -52,12 +52,31 @@ class PostService():
     async def get_posts_with_tag(self, db: Session, tag_content: str,
                                  limit: int, offset: int):
         posts = db.query(PostModel).join(TagModel).filter(
-            TagModel.content == tag_content).offset(offset).limit(limit).all()
+            TagModel.content == tag_content).order_by(desc(
+                PostModel.id)).offset(offset).limit(limit).all()
 
         if not posts:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="No posts found with the specified tag")
 
+        return posts
+
+    async def get_posts_with_tag_personal(self, username: str,
+                                          tag_content: str, db: Session,
+                                          offset: int, limit: int):
+        user = db.query(UserModel).filter(
+            UserModel.username == username).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='User does not exist')
+        posts = db.query(PostModel).join(TagModel).filter(
+            TagModel.content == tag_content).filter(
+                PostModel.id.not_in(
+                    user.prohibited_posts if user.prohibited_posts else [])
+            ).order_by(desc(PostModel.id)).offset(offset).limit(limit).all()
+        if not posts:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='Not posts found')
         return posts
 
     async def get_posts_pagination(self, db: Session, limit: int, offset: int):
@@ -102,17 +121,18 @@ class PostService():
 
         db.add(new_post)
         db.commit()
-        db.refresh(new_post)
+
+        post_id = new_post.id
+        post_created = db.query(PostModel).get(post_id)
 
         if post.tags:
-            post_created = db.query(PostModel).filter(
-                PostModel.user_id == creator.id).order_by(desc(
-                    PostModel.id)).first()
             for tag in post.tags:
                 new_tag = TagModel(content=tag, post_id=post_created.id)
                 db.add(new_tag)
-            db.commit()
-        return
+
+        db.commit()
+
+        return post_created
 
     async def update_post(self, db: Session, new_post: PostIn, id: int,
                           username: str):
@@ -146,7 +166,7 @@ class PostService():
         db.add(post)
         db.commit()
 
-        return
+        return post
 
     async def delete_post(self, db: Session, id: int, username: str):
         post = db.query(PostModel).filter(PostModel.id == id).first()
