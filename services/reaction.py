@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.models import Reaction as ReactionModel
-from schemas.reaction import ReactionIn, ReactionOut
+from schemas.reaction import ReactionIn
 from models.models import User as UserModel
 from fastapi import HTTPException, status
 
@@ -48,7 +48,7 @@ class ReactionService():
                                      post_id=reaction.post_id)
         db.add(new_reaction)
         db.commit()
-        return
+        return new_reaction
 
     async def delete_reaction(self, post_id: int, db: Session, username: str):
         creator = db.query(UserModel).filter(
