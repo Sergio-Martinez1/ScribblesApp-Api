@@ -28,13 +28,13 @@ async def get_my_reactions(db: Session = Depends(get_db),
 
 
 @reactions_router.post('/',
-                       response_model=dict,
+                       response_model=ReactionOut,
                        status_code=status.HTTP_201_CREATED)
 async def create_reaction(reaction: ReactionIn,
                           db: Session = Depends(get_db),
                           user: str = Depends(authenticate)):
-    await ReactionService().create_reaction(reaction, db, user)
-    return JSONResponse(content={"message": "Succesful reaction created."})
+    reaction = await ReactionService().create_reaction(reaction, db, user)
+    return reaction
 
 
 @reactions_router.delete('/{post_id}',
