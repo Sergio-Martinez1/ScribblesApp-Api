@@ -21,7 +21,7 @@ def init_connection_pool(conector: Connector) -> Engine:
                                 user=settings.CLOUD_SQL_USER,
                                 password=settings.CLOUD_SQL_PASSWORD,
                                 db=settings.POSTGRES_DB,
-                                ip_type="PRIVATE")
+                                ip_type="PUBLIC")
         return conn
 
     engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, creator=getconn)
